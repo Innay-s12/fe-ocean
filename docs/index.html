@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ocean Market</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      min-height: 100vh;
+    }
+    .wave-bg {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100px;
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="%2303a9f4"/><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="%2303a9f4"/><path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="%2303a9f4"/></svg>');
+      background-size: cover;
+      z-index: -1;
+    }
+    .product-card {
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0, 119, 182, 0.1);
+    }
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 119, 182, 0.2);
+    }
+    .cart-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background-color: #ef4444;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    #cart-sidebar {
+      transition: transform 0.3s ease;
+    }
+    #cart-sidebar.hidden {
+      transform: translateX(100%);
+    }
+  </style>
+</head>
+<body class="p-6 relative overflow-x-hidden">
+  <div class="wave-bg"></div>
+  
+  <!-- Header dengan Keranjang -->
+  <div class="max-w-7xl mx-auto mb-8">
+    <div class="flex justify-between items-center">
+      <div class="text-center">
+        <h1 class="text-4xl font-bold text-[#0369a1] mb-1">Ocean Market</h1>
+        <p class="text-[#0284c7]">Produk terbaik untuk kulit cantikmu 💙</p>
+      </div>
+      <div class="relative">
+        <button id="cart-button" class="p-2 rounded-full bg-[#0284c7] text-white hover:bg-[#0369a1] transition-colors">
+          <i class="fas fa-shopping-cart fa-lg"></i>
+          <span id="cart-count" class="cart-badge">0</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar Keranjang -->
+  <div id="cart-sidebar" class="hidden fixed inset-y-0 right-0 w-full sm:w-96 bg-white shadow-lg z-50 p-6 overflow-y-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-[#0369a1]">Keranjang Belanja</h2>
+      <button id="close-cart" class="text-gray-500 hover:text-gray-700">
+        <i class="fas fa-times fa-lg"></i>
+      </button>
+    </div>
+    
+    <div id="cart-items" class="space-y-4">
+      <!-- Item keranjang akan muncul di sini -->
+      <p id="empty-cart-message" class="text-center text-gray-500 py-8">Keranjang belanja kosong</p>
+    </div>
+    
+    <div id="cart-summary" class="mt-6 pt-4 border-t border-gray-200 hidden">
+      <div class="flex justify-between mb-2">
+        <span class="font-semibold">Total:</span>
+        <span id="cart-total" class="font-bold text-[#0369a1]">Rp0</span>
+      </div>
+      <button id="checkout-button" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center mt-4">
+        <i class="fab fa-whatsapp fa-lg mr-2"></i> Pesan via WhatsApp
+      </button>
+    </div>
+  </div>
+
+  <!-- Konten Utama -->
+  <div class="max-w-7xl mx-auto">
+    <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      <!-- Produk akan dimuat di sini -->
+    </div>
+  </div>
+
+  <script>
+    const baseUrl = "https://crud-api-production-1baf.up.railway.app";
+    let cart = [];
+    const whatsappNumber = "082124404618";
+
+    // Fungsi untuk memuat produk
+    function loadProducts() {
+      fetch(baseUrl + "/api/products")
+        .then(res => res.json())
+        .then(products => {
+          const grid = document.getElementById('product-grid');
+          grid.innerHTML = '';
+
+          if (products.length === 0) {
+            grid.innerHTML = '<p class="col-span-full text-center text-[#0369a1] py-12">Tidak ada produk tersedia saat ini</p>';
+            return;
+          }
+
+          products.forEach(p => {
+            const namaProduk = p.nama_produk || 'Produk';
+            const deskripsi = p.detail || 'Tidak ada deskripsi';
+            const harga = p.harga ? parseInt(p.harga) : 0;
+            const formattedHarga = harga ? `Rp${harga.toLocaleString('id-ID')}` : 'Rp0';
+            const gambar = p.gambar || `https://source.unsplash.com/random/400x250/?ocean,${encodeURIComponent(namaProduk.split(' ')[0])},blue`;
+
+            const card = document.createElement('div');
+            card.className = "product-card bg-white rounded-xl overflow-hidden border border-[#e0f2fe]";
+            card.innerHTML = `
+              <div class="relative overflow-hidden h-56">
+                <img src="${gambar}" alt="${namaProduk}" 
+                     class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                     onerror="this.src='https://images.unsplash.com/photo-1505118380757-91f5f5632de0?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80'">
+                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#0369a1] to-transparent p-4">
+                  <span class="text-white font-semibold text-lg">${formattedHarga}</span>
+                </div>
+              </div>
+              <div class="p-5">
+                <h2 class="text-xl font-semibold text-[#0369a1] mb-2">${namaProduk}</h2>
+                <p class="text-[#0284c7] text-sm mb-4">${deskripsi.slice(0, 80)}${deskripsi.length > 80 ? '...' : ''}</p>
+                <div class="flex space-x-2">
+                  <button class="add-to-cart flex-1 bg-[#0284c7] hover:bg-[#0369a1] text-white py-2 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center"
+                          data-id="${p.id}" 
+                          data-name="${namaProduk}" 
+                          data-price="${harga}" 
+                          data-image="${gambar}">
+                    <i class="fas fa-cart-plus mr-2"></i> Keranjang
+                  </button>
+                  <button class="buy-now flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center"
+                          data-id="${p.id}" 
+                          data-name="${namaProduk}" 
+                          data-price="${harga}" 
+                          data-image="${gambar}">
+                    <i class="fas fa-bolt mr-2"></i> Beli
+                  </button>
+                </div>
+              </div>
+            `;
+            grid.appendChild(card);
+          });
+
+          // Tambahkan event listener untuk tombol keranjang dan beli
+          document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', addToCart);
+          });
+
+          document.querySelectorAll('.buy-now').forEach(button => {
+            button.addEventListener('click', buyNow);
+          });
+        })
+        .catch(error => {
+          console.error(error);
+          document.getElementById('product-grid').innerHTML = `
+            <div class="col-span-full text-center py-12">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-[#0369a1] mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <p class="text-[#0369a1] text-xl">Gagal memuat produk. Silakan coba lagi nanti.</p>
+            </div>
+          `;
+        });
+    }
+
+    // Fungsi untuk menambahkan item ke keranjang
+    function addToCart(e) {
+      const button = e.currentTarget;
+      const id = button.getAttribute('data-id');
+      const name = button.getAttribute('data-name');
+      const price = parseInt(button.getAttribute('data-price'));
+      const image = button.getAttribute('data-image');
+      
+      // Cek apakah item sudah ada di keranjang
+      const existingItem = cart.find(item => item.id === id);
+      
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({
+          id,
+          name,
+          price,
+          image,
+          quantity: 1
+        });
+      }
+      
+      updateCart();
+      showCartNotification(name);
+    }
+
+    // Fungsi untuk beli sekarang (langsung ke WhatsApp)
+    function buyNow(e) {
+      const button = e.currentTarget;
+      const id = button.getAttribute('data-id');
+      const name = button.getAttribute('data-name');
+      const price = parseInt(button.getAttribute('data-price'));
+      
+      const message = `Halo, saya ingin memesan:\n\n*${name}*\nHarga: Rp${price.toLocaleString('id-ID')}\n\nTotal: *Rp${price.toLocaleString('id-ID')}*`;
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+      
+      window.open(whatsappUrl, '_blank');
+    }
+
+    // Fungsi untuk update tampilan keranjang
+    function updateCart() {
+      const cartCount = document.getElementById('cart-count');
+      const cartItems = document.getElementById('cart-items');
+      const cartSummary = document.getElementById('cart-summary');
+      const emptyCartMessage = document.getElementById('empty-cart-message');
+      
+      // Update counter
+      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      cartCount.textContent = totalItems;
+      
+      // Update daftar item
+      cartItems.innerHTML = '';
+      
+      if (cart.length === 0) {
+        emptyCartMessage.classList.remove('hidden');
+        cartSummary.classList.add('hidden');
+      } else {
+        emptyCartMessage.classList.add('hidden');
+        
+        let totalPrice = 0;
+        
+        cart.forEach(item => {
+          const itemTotal = item.price * item.quantity;
+          totalPrice += itemTotal;
+          
+          const cartItem = document.createElement('div');
+          cartItem.className = "flex items-start py-3 border-b border-gray-100";
+          cartItem.innerHTML = `
+            <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded mr-3">
+            <div class="flex-1">
+              <h3 class="font-medium text-[#0369a1]">${item.name}</h3>
+              <p class="text-sm text-gray-600">Rp${item.price.toLocaleString('id-ID')} x ${item.quantity}</p>
+              <p class="font-semibold">Rp${(item.price * item.quantity).toLocaleString('id-ID')}</p>
+            </div>
+            <div class="flex items-center">
+              <button class="decrease-quantity text-gray-500 hover:text-red-500 p-1" data-id="${item.id}">
+                <i class="fas fa-minus"></i>
+              </button>
+              <span class="mx-2">${item.quantity}</span>
+              <button class="increase-quantity text-gray-500 hover:text-green-500 p-1" data-id="${item.id}">
+                <i class="fas fa-plus"></i>
+              </button>
+              <button class="remove-item text-red-500 hover:text-red-700 ml-2 p-1" data-id="${item.id}">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          `;
+          cartItems.appendChild(cartItem);
+        });
+        
+        // Update total
+        document.getElementById('cart-total').textContent = `Rp${totalPrice.toLocaleString('id-ID')}`;
+        cartSummary.classList.remove('hidden');
+        
+        // Tambahkan event listener untuk tombol quantity
+        document.querySelectorAll('.increase-quantity').forEach(button => {
+          button.addEventListener('click', (e) => {
+            const id = e.currentTarget.getAttribute('data-id');
+            const item = cart.find(item => item.id === id);
+            if (item) {
+              item.quantity += 1;
+              updateCart();
+            }
+          });
+        });
+        
+        document.querySelectorAll('.decrease-quantity').forEach(button => {
+          button.addEventListener('click', (e) => {
+            const id = e.currentTarget.getAttribute('data-id');
+            const item = cart.find(item => item.id === id);
+            if (item && item.quantity > 1) {
+              item.quantity -= 1;
+              updateCart();
+            }
+          });
+        });
+        
+        document.querySelectorAll('.remove-item').forEach(button => {
+          button.addEventListener('click', (e) => {
+            const id = e.currentTarget.getAttribute('data-id');
+            cart = cart.filter(item => item.id !== id);
+            updateCart();
+          });
+        });
+      }
+    }
+
+    // Fungsi untuk menampilkan notifikasi
+    function showCartNotification(productName) {
+      const notification = document.createElement('div');
+      notification.className = "fixed bottom-4 right-4 bg-[#0369a1] text-white px-4 py-2 rounded-lg shadow-lg flex items-center";
+      notification.innerHTML = `
+        <i class="fas fa-check-circle mr-2"></i>
+        <span>${productName} ditambahkan ke keranjang</span>
+      `;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+        setTimeout(() => notification.remove(), 300);
+      }, 2000);
+    }
+
+    // Fungsi untuk checkout via WhatsApp
+    function checkout() {
+      if (cart.length === 0) return;
+      
+      let message = "Halo, saya ingin memesan:\n\n";
+      let totalPrice = 0;
+      
+      cart.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        totalPrice += itemTotal;
+        message += `*${item.name}*\n`;
+        message += `Harga: Rp${item.price.toLocaleString('id-ID')} x ${item.quantity}\n`;
+        message += `Subtotal: Rp${itemTotal.toLocaleString('id-ID')}\n\n`;
+      });
+      
+      message += `*Total Pesanan: Rp${totalPrice.toLocaleString('id-ID')}*`;
+      
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+    }
+
+    // Event listeners
+    document.getElementById('cart-button').addEventListener('click', () => {
+      document.getElementById('cart-sidebar').classList.remove('hidden');
+    });
+
+    document.getElementById('close-cart').addEventListener('click', () => {
+      document.getElementById('cart-sidebar').classList.add('hidden');
+    });
+
+    document.getElementById('checkout-button').addEventListener('click', checkout);
+
+    // Load products saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', loadProducts);
+  </script>
+</body>
+</html>
